@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace TGSJuice
 {
-    [System.Serializable]
     [AddComponentMenu("")]
     [JuiceLabel("Play Sound")]
+    [JuiceDescription("Play any audio clip")]
     public class TGSPlayAudioJuice : TGSJuiceBase
     {
         public float Volume;

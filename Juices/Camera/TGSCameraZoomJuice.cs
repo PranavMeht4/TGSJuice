@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace TGSJuice
 {
-    [System.Serializable]
     [AddComponentMenu("")]
     [JuiceLabel("Camera Zoom")]
+    [JuiceDescription("Lerp camera's FOV to targetFOV")]
     public class TGSCameraZoomJuice : TGSJuiceBase
     {
         public float TargetFOV = 60f;

@@ -6,10 +6,11 @@ namespace TGSJuice
     [System.Serializable]
     [AddComponentMenu("")]
     [JuiceLabel("Slow Motion")]
+    [JuiceDescription("Trigger slow motion effect /n" + "set timeSpeed to 0 to enable freeze frame effect")]
     public class TGSSlowMoJuice : TGSJuiceBase
     {
-        public float timeSpeed = 0.2f;
-        public float freezeDuration = 0.2f;
+        public float TimeSpeed = 0.2f;
+        public float FreezeDuration = 0.2f;
 
         public override void Play()
         {
@@ -18,9 +19,9 @@ namespace TGSJuice
 
         private IEnumerator FreezeFrame()
         {
-            Time.timeScale = timeSpeed;
+            Time.timeScale = TimeSpeed;
             Time.fixedDeltaTime = 0.02F * Time.timeScale;
-            yield return new WaitForSecondsRealtime(freezeDuration);
+            yield return new WaitForSecondsRealtime(FreezeDuration);
 
             Time.timeScale = 1f;
             Time.fixedDeltaTime = 0.02F * Time.timeScale;

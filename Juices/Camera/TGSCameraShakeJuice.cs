@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace TGSJuice
 {
-    [System.Serializable]
     [AddComponentMenu("")]
     [JuiceLabel("Camera Shake")]
+    [JuiceDescription("Shake camera")]
     public class TGSCameraShakeJuice : TGSJuiceBase
     {
         public float Magnitude = .1f;

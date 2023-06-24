@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace TGSJuice
 {
-    [System.Serializable]
     [AddComponentMenu("")]
-    [JuiceLabel("Camera Flash")]
+    [JuiceLabel("Screen Flash")]
+    [JuiceDescription("Applies a flash effect to the camera.\n" + "- Add TGSFlashAction component to the empty UI. It will add all the necessary components.\n")]
     public class TGSCameraFlashJuice : TGSJuiceBase
     {
         public float FlashDuration = 0.2f;

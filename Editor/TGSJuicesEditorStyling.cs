@@ -23,8 +23,7 @@ namespace TGSJuice
             get
             {
                 var style = new GUIStyle(EditorStyles.foldout);
-                style.fontSize = 14;
-                style.fontStyle = FontStyle.BoldAndItalic;
+                style.font = EditorStyles.boldFont;
                 return style;
             }
         }

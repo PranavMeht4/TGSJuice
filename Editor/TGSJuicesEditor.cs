@@ -99,6 +99,10 @@ namespace TGSJuice
             // Create the buttons for 'Play' and 'Remove'
             if (_juiceFoldouts[type])
             {
+                JuiceDescriptionAttribute juiceDesc = Attribute.GetCustomAttribute(type, typeof(JuiceDescriptionAttribute)) as JuiceDescriptionAttribute;
+                if (juiceDesc != null)
+                    EditorGUILayout.HelpBox(juiceDesc.Description, MessageType.Info);
+
                 EditorGUI.indentLevel++;
                 // Only call the custom editor's OnInspectorGUI
                 _juiceEditors[type].OnInspectorGUI();
