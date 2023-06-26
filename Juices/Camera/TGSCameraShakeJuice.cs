@@ -3,7 +3,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Camera Shake")]
+    [JuiceLabel("Camera/Camera Shake")]
     [JuiceDescription("Shake camera")]
     public class TGSCameraShakeJuice : TGSJuiceBase
     {

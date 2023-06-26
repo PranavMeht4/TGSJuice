@@ -4,42 +4,69 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Camera Zoom")]
+    [JuiceLabel("Camera/Camera Zoom")]
     [JuiceDescription("Lerp camera's FOV to targetFOV")]
     public class TGSCameraZoomJuice : TGSJuiceBase
     {
-        public float TargetFOV = 60f;
-        public float Duration = 1f;
+        public float zoomDuration = 0.5f;
+        public float zoomAmount = 0.1f;
+        public int repeatCount = 0;
+        public float delayBetweenZooms = 0.5f;
 
-        private Camera _cam;
+        private Camera mainCamera;
+        private float originalFieldOfView;
 
         private void Awake()
         {
-            _cam = Camera.main;
+            mainCamera = Camera.main;
+            originalFieldOfView = mainCamera.fieldOfView;
         }
 
         public override void Play()
         {
-            StartCoroutine(Zoom());
+            StartCoroutine(ZoomCamera());
         }
 
-        private IEnumerator Zoom()
+        private IEnumerator ZoomCamera()
         {
-            float initialFOV = _cam.fieldOfView;
-            float elapsed = 0f;
+            float targetFieldOfView = originalFieldOfView + zoomAmount;
+            int remainingRepeats = repeatCount;
 
-            while (elapsed < Duration)
+            while (remainingRepeats != 0)
             {
-                float t = elapsed / Duration;
+                // Zoom in
+                yield return ChangeFieldOfView(mainCamera, targetFieldOfView, zoomDuration);
 
-                _cam.fieldOfView = Mathf.Lerp(initialFOV, TargetFOV, t);
+                // Delay between zooms
+                yield return new WaitForSeconds(delayBetweenZooms);
 
-                elapsed += Time.deltaTime;
+                // Zoom out
+                yield return ChangeFieldOfView(mainCamera, originalFieldOfView, zoomDuration);
+
+                if (remainingRepeats > 0)
+                    remainingRepeats--;
+
+                if (remainingRepeats == 0)
+                    break;
 
                 yield return null;
             }
+        }
 
-            _cam.fieldOfView = TargetFOV;
+        private IEnumerator ChangeFieldOfView(Camera camera, float targetFieldOfView, float duration)
+        {
+            float initialFieldOfView = camera.fieldOfView;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / duration);
+                camera.fieldOfView = Mathf.Lerp(initialFieldOfView, targetFieldOfView, t);
+                yield return null;
+            }
+
+            camera.fieldOfView = targetFieldOfView;
         }
     }
 }

@@ -46,14 +46,28 @@ namespace TGSJuice
 
         private void HandleAddJuicePopup(TGSJuices target)
         {
-            string[] options = new[] { "Add new juice..." }
-                .Concat(_juiceTypes.Select(type =>
+            Dictionary<string, List<string>> categorizedOptions = new Dictionary<string, List<string>>();
+            foreach (var type in _juiceTypes)
+            {
+                JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
+                string juiceLabel = juiceLabelAttr != null ? juiceLabelAttr.Label : type.Name;
+                string category = juiceLabel.Split('/')[0];
+                if (!categorizedOptions.ContainsKey(category))
                 {
-                    JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
-                    return juiceLabelAttr != null ? juiceLabelAttr.Label : type.Name;
-                })).ToArray();
+                    categorizedOptions[category] = new List<string>();
+                }
+                categorizedOptions[category].Add(juiceLabel);
+            }
 
-            int selectedJuiceType = TGSJuicesEditorStyling.DrawStyledPopup(0, options, TGSJuicesEditorStyling.PopupStyle);
+            List<string> options = new List<string>() { "Add new juice..." };
+            foreach (var category in categorizedOptions.Keys)
+            {
+                foreach (var juice in categorizedOptions[category])
+                {
+                    options.Add(juice);
+                }
+            }
+            int selectedJuiceType = TGSJuicesEditorStyling.DrawStyledPopup(0, options.ToArray(), TGSJuicesEditorStyling.PopupStyle);
 
             if (selectedJuiceType > 0)
             {
@@ -92,7 +106,13 @@ namespace TGSJuice
             }
 
             JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
-            string label = juiceLabelAttr != null ? juiceLabelAttr.Label : type.Name;
+
+            string label = type.Name;
+            if (juiceLabelAttr != null)
+            {
+                string[] labelParts = juiceLabelAttr.Label.Split('/');
+                label = labelParts.Length > 1 ? labelParts[1] : labelParts[0];
+            }
 
             _juiceFoldouts[type] = TGSJuicesEditorStyling.DrawStyledFoldout(_juiceFoldouts[type], label, TGSJuicesEditorStyling.FoldoutStyle);
 

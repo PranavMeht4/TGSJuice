@@ -3,7 +3,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Screen Flash")]
+    [JuiceLabel("Camera/Screen Flash")]
     [JuiceDescription("Applies a flash effect to the camera.\n" + "- Add TGSFlashAction component to the empty UI. It will add all the necessary components.\n")]
     public class TGSCameraFlashJuice : TGSJuiceBase
     {
