@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace TGSJuice
 {
+    [DisallowMultipleComponent]
     public class TGSJuices : MonoBehaviour
     {
         [SerializeReference]

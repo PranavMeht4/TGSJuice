@@ -5,12 +5,12 @@ namespace TGSJuice
 {
     [AddComponentMenu("")]
     [JuiceLabel("Camera/Camera Zoom")]
-    [JuiceDescription("Lerp camera's FOV to targetFOV")]
+    [JuiceDescription("Lerps camera's FOV to targetFOV. loopCount determines the behavior. 0: just zoom to targetFOV, 1: zoom in and zoom out once, 2: zoom in, zoom out, and zoom in again, -1: infinite loop.")]
     public class TGSCameraZoomJuice : TGSJuiceBase
     {
         public float zoomDuration = 0.5f;
         public float zoomAmount = 0.1f;
-        public int repeatCount = 0;
+        public int loopCount = 0;
         public float delayBetweenZooms = 0.5f;
 
         private Camera mainCamera;
@@ -30,26 +30,33 @@ namespace TGSJuice
         private IEnumerator ZoomCamera()
         {
             float targetFieldOfView = originalFieldOfView + zoomAmount;
-            int remainingRepeats = repeatCount;
+            int remainingLoops = loopCount;
 
-            while (remainingRepeats != 0)
+            while (remainingLoops != 0 || loopCount == -1)
             {
                 // Zoom in
                 yield return ChangeFieldOfView(mainCamera, targetFieldOfView, zoomDuration);
 
-                // Delay between zooms
-                yield return new WaitForSeconds(delayBetweenZooms);
+                if (loopCount != 0)
+                {
+                    // Delay between zooms
+                    yield return new WaitForSeconds(delayBetweenZooms);
 
-                // Zoom out
-                yield return ChangeFieldOfView(mainCamera, originalFieldOfView, zoomDuration);
+                    // Zoom out
+                    yield return ChangeFieldOfView(mainCamera, originalFieldOfView, zoomDuration);
 
-                if (remainingRepeats > 0)
-                    remainingRepeats--;
+                    if (remainingLoops > 0)
+                        remainingLoops--;
 
-                if (remainingRepeats == 0)
+                    if (remainingLoops == 0 && loopCount != -1)
+                        break;
+
+                    yield return null;
+                }
+                else
+                {
                     break;
-
-                yield return null;
+                }
             }
         }
 
