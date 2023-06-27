@@ -8,6 +8,7 @@ namespace TGSJuice
     [JuiceDescription("Rotate any gameobject smoothly")]
     public class TGSRotateJuice : TGSJuiceBase
     {
+        public Transform transformToRotate;
         public float RotationDuration = 1f;
         public Vector3 RotationAngles = Vector3.zero;
         public AnimationCurve RotationCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
@@ -30,8 +31,8 @@ namespace TGSJuice
                 while (elapsed < RotationDuration)
                 {
                     float t = elapsed / RotationDuration;
-                    t = RotationCurve.Evaluate(t);  // Apply the animation curve to the time variable
-                    transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, t);
+                    t = RotationCurve.Evaluate(t);
+                    transformToRotate.rotation = Quaternion.Lerp(initialRotation, targetRotation, t);
 
                     elapsed += Time.deltaTime;
                     yield return null;
