@@ -3,13 +3,8 @@ using System.Collections;
 
 namespace TGSJuice
 {
-    public class TGSWobbleAction : MonoBehaviour
+    public class TGSWobbleAction : TGSActionBase<TGSWobbleParams>
     {
-        public delegate void WobbleDelegate(int channelId, float wobbleAmount, float wobbleSpeed, float wobbleFrequency, Vector3 wobbleDirection);
-        public static event WobbleDelegate WobbleInvoked;
-
-        public int ChannelId;
-
         private Vector3 _initialScale;
 
         private void Awake()
@@ -17,26 +12,11 @@ namespace TGSJuice
             _initialScale = transform.localScale;
         }
 
-        private void OnEnable()
+        protected override void PerformAction(TGSWobbleParams actionParams)
         {
-            WobbleInvoked += Wobble;
-        }
-
-        private void OnDisable()
-        {
-            WobbleInvoked -= Wobble;
-        }
-
-        public static void InvokeWobble(int channelId, float wobbleAmount, float wobbleSpeed, float wobbleFrequency, Vector3 wobbleDirection)
-        {
-            WobbleInvoked?.Invoke(channelId, wobbleAmount, wobbleSpeed, wobbleFrequency, wobbleDirection);
-        }
-
-        public void Wobble(int channelId, float wobbleAmount, float wobbleSpeed, float wobbleFrequency, Vector3 wobbleDirection)
-        {
-            if (channelId == ChannelId)
+            if (actionParams.ChannelId == ChannelId)
             {
-                StartCoroutine(WobbleRoutine(wobbleAmount, wobbleSpeed, wobbleFrequency, wobbleDirection));
+                StartCoroutine(WobbleRoutine(actionParams.WobbleAmount, actionParams.WobbleSpeed, actionParams.WobbleFrequency, actionParams.WobbleDirection));
             }
         }
 
@@ -55,5 +35,14 @@ namespace TGSJuice
 
             transform.localScale = _initialScale;
         }
+    }
+
+    public class TGSWobbleParams
+    {
+        public int ChannelId;
+        public float WobbleAmount;
+        public float WobbleSpeed;
+        public float WobbleFrequency;
+        public Vector3 WobbleDirection;
     }
 }

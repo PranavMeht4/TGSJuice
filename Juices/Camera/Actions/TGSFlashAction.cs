@@ -7,7 +7,7 @@ namespace TGSJuice
 {
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(Image))]
-    public class TGSFlashAction : MonoBehaviour
+    public class TGSFlashAction : TGSActionBase<TGSFlashActionParam>
     {
         public static UnityAction<float, float, Color> CameraFlashInvoked;
 
@@ -21,25 +21,6 @@ namespace TGSJuice
         {
             _flashOverlay = GetComponent<CanvasGroup>();
             _flashImage = GetComponent<Image>();
-        }
-
-        private void OnEnable()
-        {
-            CameraFlashInvoked += Flash;
-        }
-
-        private void OnDisable()
-        {
-            CameraFlashInvoked -= Flash;
-        }
-
-        public void Flash(float flashDuration, float maxOpacity, Color flashColor)
-        {
-            _flashDuration = flashDuration;
-            _maxOpacity = maxOpacity;
-            _flashImage.color = flashColor;
-
-            StartCoroutine(FlashCoroutine());
         }
 
         private IEnumerator FlashCoroutine()
@@ -62,5 +43,21 @@ namespace TGSJuice
 
             _flashOverlay.alpha = 0f;
         }
+
+        protected override void PerformAction(TGSFlashActionParam actionParams)
+        {
+            _flashDuration = actionParams.FlashDuration;
+            _maxOpacity = actionParams.MaxOpacity;
+            _flashImage.color = actionParams.FlashColor;
+
+            StartCoroutine(FlashCoroutine());
+        }
+    }
+
+    public class TGSFlashActionParam
+    {
+        public float FlashDuration;
+        public float MaxOpacity;
+        public Color FlashColor;
     }
 }

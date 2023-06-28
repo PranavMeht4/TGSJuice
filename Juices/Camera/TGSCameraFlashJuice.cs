@@ -10,6 +10,7 @@ namespace TGSJuice
         public float FlashDuration = 0.2f;
         public float MaxOpacity = 1f;
         public Color FlashColor = Color.white;
+        public TGSFlashAction TGSFlashAction;
 
         public override void Play()
         {

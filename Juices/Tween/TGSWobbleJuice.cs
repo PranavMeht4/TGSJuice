@@ -12,10 +12,18 @@ namespace TGSJuice
         public float WobbleSpeed = 1f;
         public float WobbleFrequency = 1f;
         public Vector3 WobbleDirection = Vector3.one;
+        public TGSWobbleAction WobbleAction;
 
         public override void Play()
         {
-            TGSWobbleAction.InvokeWobble(ChannelId, WobbleAmount, WobbleSpeed, WobbleFrequency, WobbleDirection);
+            TGSWobbleAction.InvokeAction(new TGSWobbleParams
+            {
+                ChannelId = ChannelId,
+                WobbleAmount = WobbleAmount,
+                WobbleSpeed = WobbleSpeed,
+                WobbleFrequency = WobbleFrequency,
+                WobbleDirection = WobbleDirection
+            });
         }
     }
 }

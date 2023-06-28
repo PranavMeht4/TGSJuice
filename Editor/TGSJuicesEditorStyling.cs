@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -5,6 +6,8 @@ namespace TGSJuice
 {
     public class TGSJuicesEditorStyling
     {
+        public static List<GameObject> ObjectsToHighlight { get; } = new List<GameObject>();
+
         // Define a style for button
         public static GUIStyle ButtonStyle
         {
@@ -64,6 +67,16 @@ namespace TGSJuice
         public static int DrawStyledPopup(int selectedIndex, string[] options, GUIStyle style)
         {
             return EditorGUILayout.Popup(selectedIndex, options, style);
+        }
+
+        public static void HierarchWindowOnGUI(int instanceID, Rect selectionRect)
+        {
+            GameObject currentObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
+
+            if (currentObject != null && ObjectsToHighlight.Contains(currentObject))
+            {
+                EditorGUI.DrawRect(selectionRect, new Color(0, 0, .2f, .2f));
+            }
         }
     }
 }

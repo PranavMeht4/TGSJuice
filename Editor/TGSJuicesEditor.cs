@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,14 +17,12 @@ namespace TGSJuice
         private void OnEnable()
         {
             FindJuiceTypes();
+            EditorApplication.hierarchyWindowItemOnGUI += HierarchWindowOnGUI;
         }
 
-        private void FindJuiceTypes()
+        private void OnDisable()
         {
-            _juiceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                           from assemblyType in domainAssembly.GetTypes()
-                           where assemblyType.IsSubclassOf(typeof(TGSJuiceBase))
-                           select assemblyType).ToList();
+            EditorApplication.hierarchyWindowItemOnGUI -= HierarchWindowOnGUI;
         }
 
         public override void OnInspectorGUI()
@@ -42,6 +41,14 @@ namespace TGSJuice
             GUILayout.EndHorizontal();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void FindJuiceTypes()
+        {
+            _juiceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                           from assemblyType in domainAssembly.GetTypes()
+                           where assemblyType.IsSubclassOf(typeof(TGSJuiceBase))
+                           select assemblyType).ToList();
         }
 
         private void HandleAddJuicePopup(TGSJuices target)
@@ -85,6 +92,11 @@ namespace TGSJuice
                     _juiceEditors[selectedType] = _newJuiceEditor;
                 }
             }
+        }
+
+        private void RenderPlayAllButton(TGSJuices target)
+        {
+            TGSJuicesEditorStyling.DrawStyledButton("Play All", TGSJuicesEditorStyling.ButtonStyle, () => target.PlayAll());
         }
 
         private void RenderJuiceEditor(TGSJuiceBase juice, TGSJuices target)
@@ -135,13 +147,65 @@ namespace TGSJuice
                     target.juices.Remove(juice);
                     Undo.DestroyObjectImmediate(juice);
                 });
+                TGSJuicesEditorStyling.DrawStyledButton("References", TGSJuicesEditorStyling.ButtonStyle, () =>
+                {
+                    Type baseActionType = typeof(TGSActionBase<>);
+                    Type derivedType = null;
+                    var fields = juice.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+
+                    foreach (var field in fields)
+                    {
+                        if (IsSubclassOfRawGeneric(baseActionType, field.FieldType))
+                        {
+                            derivedType = field.FieldType;
+                            break;
+                        }
+                    }
+
+                    if (derivedType != null)
+                    {
+                        TGSJuicesEditorStyling.ObjectsToHighlight.Clear();
+                        var allMonoBehaviours = FindObjectsOfType<MonoBehaviour>();
+
+                        foreach (var obj in allMonoBehaviours)
+                        {
+                            if (IsSubclassOfRawGeneric(derivedType, obj.GetType()))
+                            {
+                                // Selection.activeGameObject = obj.gameObject;
+                                TGSJuicesEditorStyling.ObjectsToHighlight.Add(obj.gameObject);
+                            }
+                        }
+                    }
+
+                    EditorApplication.RepaintHierarchyWindow();
+                });
+
+                TGSJuicesEditorStyling.DrawStyledButton("Clear Highlights", TGSJuicesEditorStyling.ButtonStyle, () =>
+                {
+                    TGSJuicesEditorStyling.ObjectsToHighlight.Clear();
+                    EditorApplication.RepaintHierarchyWindow();
+                });
                 EditorGUILayout.EndHorizontal();
             }
         }
 
-        private void RenderPlayAllButton(TGSJuices target)
+        public static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
         {
-            TGSJuicesEditorStyling.DrawStyledButton("Play All", TGSJuicesEditorStyling.ButtonStyle, () => target.PlayAll());
+            while (toCheck != null && toCheck != typeof(object))
+            {
+                var cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                if (generic == cur)
+                {
+                    return true;
+                }
+                toCheck = toCheck.BaseType;
+            }
+            return false;
+        }
+
+        private void HierarchWindowOnGUI(int instanceID, Rect selectionRect)
+        {
+            TGSJuicesEditorStyling.HierarchWindowOnGUI(instanceID, selectionRect);
         }
     }
 }
