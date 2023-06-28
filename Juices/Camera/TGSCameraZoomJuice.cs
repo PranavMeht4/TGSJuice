@@ -8,18 +8,18 @@ namespace TGSJuice
     [JuiceDescription("Lerps camera's FOV to targetFOV. loopCount determines the behavior. 0: just zoom to targetFOV, 1: zoom in and zoom out once, 2: zoom in, zoom out, and zoom in again, -1: infinite loop.")]
     public class TGSCameraZoomJuice : TGSJuiceBase
     {
-        public float zoomDuration = 0.5f;
-        public float zoomAmount = 0.1f;
-        public int loopCount = 0;
-        public float delayBetweenZooms = 0.5f;
+        public float ZoomDuration = 0.5f;
+        public float ZoomAmount = 0.1f;
+        public int LoopCount = 0;
+        public float DelayBetweenZooms = 0.5f;
 
-        private Camera mainCamera;
-        private float originalFieldOfView;
+        private Camera _mainCamera;
+        private float _originalFieldOfView;
 
         private void Awake()
         {
-            mainCamera = Camera.main;
-            originalFieldOfView = mainCamera.fieldOfView;
+            _mainCamera = Camera.main;
+            _originalFieldOfView = _mainCamera.fieldOfView;
         }
 
         public override void Play()
@@ -29,26 +29,26 @@ namespace TGSJuice
 
         private IEnumerator ZoomCamera()
         {
-            float targetFieldOfView = originalFieldOfView + zoomAmount;
-            int remainingLoops = loopCount;
+            float targetFieldOfView = _originalFieldOfView + ZoomAmount;
+            int remainingLoops = LoopCount;
 
-            while (remainingLoops != 0 || loopCount == -1)
+            while (remainingLoops != 0 || LoopCount == -1)
             {
                 // Zoom in
-                yield return ChangeFieldOfView(mainCamera, targetFieldOfView, zoomDuration);
+                yield return ChangeFieldOfView(_mainCamera, targetFieldOfView, ZoomDuration);
 
-                if (loopCount != 0)
+                if (LoopCount != 0)
                 {
                     // Delay between zooms
-                    yield return new WaitForSeconds(delayBetweenZooms);
+                    yield return new WaitForSeconds(DelayBetweenZooms);
 
                     // Zoom out
-                    yield return ChangeFieldOfView(mainCamera, originalFieldOfView, zoomDuration);
+                    yield return ChangeFieldOfView(_mainCamera, _originalFieldOfView, ZoomDuration);
 
                     if (remainingLoops > 0)
                         remainingLoops--;
 
-                    if (remainingLoops == 0 && loopCount != -1)
+                    if (remainingLoops == 0 && LoopCount != -1)
                         break;
 
                     yield return null;

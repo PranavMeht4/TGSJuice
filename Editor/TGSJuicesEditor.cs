@@ -73,7 +73,7 @@ namespace TGSJuice
             {
                 Type selectedType = _juiceTypes[selectedJuiceType - 1];
                 var newJuice = Undo.AddComponent(target.gameObject, selectedType) as TGSJuiceBase;
-                newJuice.hideFlags = HideFlags.HideInInspector;
+                newJuice.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
 
                 Undo.RecordObject(target, "Add Juice");
                 target.juices.Add(newJuice);
