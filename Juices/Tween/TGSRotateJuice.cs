@@ -5,7 +5,7 @@ namespace TGSJuice
 {
     [AddComponentMenu("")]
     [JuiceLabel("Tween/Rotation Effect")]
-    [JuiceDescription("Rotate any gameobject smoothly")]
+    [JuiceDescription("Rotate this gameobject smoothly")]
     public class TGSRotateJuice : TGSJuiceBase
     {
         public Transform TransformToRotate;

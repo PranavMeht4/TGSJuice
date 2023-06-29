@@ -14,6 +14,7 @@ namespace TGSJuice
             get
             {
                 GUIStyle style = new GUIStyle(GUI.skin.label);
+                style.richText = true;
                 style.wordWrap = true;
                 style.normal.textColor = Color.white;
                 style.normal.background = MakeTex(1, 1, new Color(0.15f, 0.15f, 0.15f, .5f));

@@ -4,7 +4,7 @@ namespace TGSJuice
 {
     [AddComponentMenu("")]
     [JuiceLabel("Play Particle")]
-    [JuiceDescription("Play particle effect")]
+    [JuiceDescription("Play assigned particle effect")]
     public class TGSPlayParticleJuice : TGSJuiceBase
     {
         public ParticleSystem ParticleEffect;

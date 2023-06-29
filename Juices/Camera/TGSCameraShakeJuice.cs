@@ -4,7 +4,7 @@ namespace TGSJuice
 {
     [AddComponentMenu("")]
     [JuiceLabel("Camera/Camera Shake")]
-    [JuiceDescription("Apply shake effect to the camera. Ensure that the camera has a TGSCameraShakeAction component attached.")]
+    [JuiceDescription("Apply shake effect to the camera. Ensure that the camera has a <color=#ADD8E6>TGSCameraShakeAction</color> component attached.")]
     public class TGSCameraShakeJuice : TGSJuiceBase
     {
         public float Magnitude = 0.1f;

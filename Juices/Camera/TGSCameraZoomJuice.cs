@@ -1,11 +1,10 @@
-using System.Collections;
 using UnityEngine;
 
 namespace TGSJuice
 {
     [AddComponentMenu("")]
     [JuiceLabel("Camera/Camera Zoom")]
-    [JuiceDescription("Apply zoom effect to the camera. Ensure that the camera has a TGSCameraZoomAction component attached.")]
+    [JuiceDescription("Apply zoom effect to the camera. Ensure that the camera has a <color=#ADD8E6>TGSCameraZoomAction</color> component attached.")]
     public class TGSCameraZoomJuice : TGSJuiceBase
     {
         public float ZoomDuration = 0.5f;

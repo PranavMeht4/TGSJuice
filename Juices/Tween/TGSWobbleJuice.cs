@@ -4,7 +4,7 @@ namespace TGSJuice
 {
     [AddComponentMenu("")]
     [JuiceLabel("Tween/Object Wobble")]
-    [JuiceDescription("Applies a wobble effect to an object.")]
+    [JuiceDescription("Applies a wobble effect to an object. Ensure that the target has a <color=#ADD8E6>TGSWobbleAction</color> component attached.")]
     public class TGSWobbleJuice : TGSJuiceBase
     {
         public int ChannelId;
