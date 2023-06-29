@@ -3,27 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace TGSJuice
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(TGSJuices))]
     public class TGSJuicesEditor : Editor
     {
         private List<Type> _juiceTypes;
-        private static Dictionary<Type, Editor> _juiceEditors = new Dictionary<Type, Editor>();
-        private static Dictionary<Type, bool> _juiceFoldouts = new Dictionary<Type, bool>();
+        private static Dictionary<int, Editor> _juiceEditors = new Dictionary<int, Editor>();
+        private static Dictionary<int, bool> _juiceFoldouts = new Dictionary<int, bool>();
 
         private void OnEnable()
         {
             FindJuiceTypes();
-            EditorApplication.hierarchyWindowItemOnGUI += HierarchWindowOnGUI;
+            // EditorApplication.hierarchyWindowItemOnGUI += HierarchWindowOnGUI;
         }
 
-        private void OnDisable()
-        {
-            EditorApplication.hierarchyWindowItemOnGUI -= HierarchWindowOnGUI;
-        }
+        // private void OnDisable()
+        // {
+        //     EditorApplication.hierarchyWindowItemOnGUI -= HierarchWindowOnGUI;
+        // }
 
         public override void OnInspectorGUI()
         {
@@ -81,15 +83,16 @@ namespace TGSJuice
                 Type selectedType = _juiceTypes[selectedJuiceType - 1];
                 var newJuice = Undo.AddComponent(target.gameObject, selectedType) as TGSJuiceBase;
                 newJuice.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+                int instanceID = newJuice.GetInstanceID();
 
                 Undo.RecordObject(target, "Add Juice");
                 target.juices.Add(newJuice);
 
-                if (!_juiceEditors.ContainsKey(selectedType))
+                if (!_juiceEditors.ContainsKey(instanceID))
                 {
                     Editor _newJuiceEditor = null;
                     CreateCachedEditor(newJuice, null, ref _newJuiceEditor);
-                    _juiceEditors[selectedType] = _newJuiceEditor;
+                    _juiceEditors[instanceID] = _newJuiceEditor;
                 }
             }
         }
@@ -105,20 +108,22 @@ namespace TGSJuice
 
         private void RenderJuiceEditor(TGSJuiceBase juice, TGSJuices target)
         {
+            int instanceID = juice.GetInstanceID();
+
             Type type = juice.GetType();
 
             // If the editor for this type doesn't exist, create it
-            if (!_juiceEditors.ContainsKey(type))
+            if (!_juiceEditors.ContainsKey(instanceID))
             {
                 Editor editor = null;
                 CreateCachedEditor(juice, null, ref editor);
-                _juiceEditors[type] = editor;
+                _juiceEditors[instanceID] = editor;
             }
 
             // If the foldout state for this type doesn't exist, initialize it to 'false'
-            if (!_juiceFoldouts.ContainsKey(type))
+            if (!_juiceFoldouts.ContainsKey(instanceID))
             {
-                _juiceFoldouts[type] = false;
+                _juiceFoldouts[instanceID] = false;
             }
 
             JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
@@ -130,22 +135,20 @@ namespace TGSJuice
                 label = labelParts.Length > 1 ? labelParts[1] : labelParts[0];
             }
 
-            _juiceFoldouts[type] = TGSJuicesEditorStyling.DrawStyledFoldout(_juiceFoldouts[type], label, TGSJuicesEditorStyling.FoldoutStyle);
+            _juiceFoldouts[instanceID] = TGSJuicesEditorStyling.DrawStyledFoldout(_juiceFoldouts[instanceID], label, TGSJuicesEditorStyling.FoldoutStyle);
 
-            // Create the buttons for 'Play' and 'Remove'
-            if (_juiceFoldouts[type])
+            // Create the buttons
+            if (_juiceFoldouts[instanceID])
             {
                 JuiceDescriptionAttribute juiceDesc = Attribute.GetCustomAttribute(type, typeof(JuiceDescriptionAttribute)) as JuiceDescriptionAttribute;
                 if (juiceDesc != null)
                 {
-                    // EditorGUI.DropShadowLabel(new Rect(0, 0, 0, 0), juiceDesc.Description);
                     EditorGUILayout.LabelField(juiceDesc.Description, TGSJuicesEditorStyling.InfoStyle);
-                    // GUILayout.Label(juiceDesc.Description);
                 }
 
                 EditorGUI.indentLevel++;
                 // Only call the custom editor's OnInspectorGUI
-                _juiceEditors[type].OnInspectorGUI();
+                _juiceEditors[instanceID].OnInspectorGUI();
                 EditorGUI.indentLevel--;
                 EditorGUILayout.BeginHorizontal();
                 TGSJuicesEditorStyling.DrawStyledButton("Play", TGSJuicesEditorStyling.ButtonStyle, () => juice.Play());
@@ -155,65 +158,11 @@ namespace TGSJuice
                     target.juices.Remove(juice);
                     Undo.DestroyObjectImmediate(juice);
                 });
-                TGSJuicesEditorStyling.DrawStyledButton("References", TGSJuicesEditorStyling.ButtonStyle, () =>
-                {
-                    Type baseActionType = typeof(TGSActionBase<>);
-                    Type derivedType = null;
-                    var fields = juice.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                TGSJuicesEditorStyling.DrawStyledButton("Listners", TGSJuicesEditorStyling.PopupStyle, () =>
+                    StringListSearchWindow.OpenSearchWindow(juice.ActionType));
 
-                    foreach (var field in fields)
-                    {
-                        if (IsSubclassOfRawGeneric(baseActionType, field.FieldType))
-                        {
-                            derivedType = field.FieldType;
-                            break;
-                        }
-                    }
-
-                    if (derivedType != null)
-                    {
-                        TGSJuicesEditorStyling.ObjectsToHighlight.Clear();
-                        var allMonoBehaviours = FindObjectsOfType<MonoBehaviour>();
-
-                        foreach (var obj in allMonoBehaviours)
-                        {
-                            if (IsSubclassOfRawGeneric(derivedType, obj.GetType()))
-                            {
-                                // Selection.activeGameObject = obj.gameObject;
-                                TGSJuicesEditorStyling.ObjectsToHighlight.Add(obj.gameObject);
-                            }
-                        }
-                    }
-
-                    EditorApplication.RepaintHierarchyWindow();
-                });
-
-                TGSJuicesEditorStyling.DrawStyledButton("Clear Highlights", TGSJuicesEditorStyling.ButtonStyle, () =>
-                {
-                    TGSJuicesEditorStyling.ObjectsToHighlight.Clear();
-                    EditorApplication.RepaintHierarchyWindow();
-                });
                 EditorGUILayout.EndHorizontal();
             }
-        }
-
-        public static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
-        {
-            while (toCheck != null && toCheck != typeof(object))
-            {
-                var cur = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
-                if (generic == cur)
-                {
-                    return true;
-                }
-                toCheck = toCheck.BaseType;
-            }
-            return false;
-        }
-
-        private void HierarchWindowOnGUI(int instanceID, Rect selectionRect)
-        {
-            TGSJuicesEditorStyling.HierarchWindowOnGUI(instanceID, selectionRect);
         }
     }
 }

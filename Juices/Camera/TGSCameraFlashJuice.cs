@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TGSJuice
@@ -10,11 +11,10 @@ namespace TGSJuice
         public float FlashDuration = 0.2f;
         public float MaxOpacity = 1f;
         public Color FlashColor = Color.white;
-        public TGSFlashAction TGSFlashAction;
+        public override Type ActionType { get { return typeof(TGSFlashAction); } }
 
         public override void Play()
         {
-            TGSFlashAction.CameraFlashInvoked?.Invoke(FlashDuration, MaxOpacity, FlashColor);
             TGSFlashAction.InvokeAction(new TGSFlashActionParam()
             {
                 FlashDuration = this.FlashDuration,

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TGSJuice
@@ -11,6 +12,7 @@ namespace TGSJuice
         public float ZoomAmount = 0.1f;
         public int LoopCount = 0;
         public float DelayBetweenZooms = 0.5f;
+        public override Type ActionType { get { return typeof(TGSCameraZoomAction); } }
 
         public override void Play()
         {

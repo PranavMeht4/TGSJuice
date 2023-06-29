@@ -37,7 +37,7 @@ Transform:
   - {fileID: 479349713530479397}
   - {fileID: 4497536682770192525}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5078540905014055396
 MeshFilter:
@@ -5050,7 +5050,6 @@ GameObject:
   - component: {fileID: 3508820659003033233}
   - component: {fileID: 7929489540534428860}
   - component: {fileID: 5871038392912624444}
-  - component: {fileID: 3289535220456235551}
   m_Layer: 0
   m_Name: JumpJuice
   m_TagString: Untagged
@@ -5087,7 +5086,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   juices:
   - {fileID: 5871038392912624444}
-  - {fileID: 3289535220456235551}
+  - {fileID: 0}
 --- !u!114 &5871038392912624444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5100,50 +5099,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c8d4cbd197983141a0e207e6bf2f057, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zoomDuration: 0.5
-  zoomAmount: 0.1
-  loopCount: 0
-  delayBetweenZooms: 0.5
---- !u!114 &3289535220456235551
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3000292416211012509}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe5f94aba4f9b5d4d8a05870cc8b45cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  transformToRotate: {fileID: 396202123054103426}
-  RotationDuration: 1
-  RotationAngles: {x: 0, y: -90, z: -90}
-  RotationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 1
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  LoopCount: 1
+  ZoomDuration: 0.5
+  ZoomAmount: 0.1
+  LoopCount: 0
+  DelayBetweenZooms: 0.5
 --- !u!1 &5967234945306624762
 GameObject:
   m_ObjectHideFlags: 0
@@ -5213,6 +5172,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Magnitude: 0.3
   Duration: 0.1
+  Speed: 1
+  ShakeVertical: 1
+  ShakeHorizontal: 1
 --- !u!114 &5436830778615284531
 MonoBehaviour:
   m_ObjectHideFlags: 0

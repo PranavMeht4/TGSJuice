@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,8 +5,6 @@ namespace TGSJuice
 {
     public class TGSJuicesEditorStyling
     {
-        public static List<GameObject> ObjectsToHighlight { get; } = new List<GameObject>();
-
         // Define a style for info
         public static GUIStyle InfoStyle
         {
@@ -56,7 +53,7 @@ namespace TGSJuice
             {
                 var style = new GUIStyle(EditorStyles.popup);
                 style.fontSize = 13;
-                style.alignment = TextAnchor.MiddleLeft;
+                style.alignment = TextAnchor.MiddleCenter;
                 return style;
             }
         }
@@ -66,7 +63,7 @@ namespace TGSJuice
         {
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(label, style, GUILayout.Width(100), GUILayout.Height(20), GUILayout.MaxWidth(75)))
+            if (GUILayout.Button(label, style, GUILayout.Width(100), GUILayout.Height(20)))
             {
                 onClick?.Invoke();
             }
@@ -85,16 +82,6 @@ namespace TGSJuice
         public static int DrawStyledPopup(int selectedIndex, string[] options, GUIStyle style)
         {
             return EditorGUILayout.Popup(selectedIndex, options, style);
-        }
-
-        public static void HierarchWindowOnGUI(int instanceID, Rect selectionRect)
-        {
-            GameObject currentObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
-
-            if (currentObject != null && ObjectsToHighlight.Contains(currentObject))
-            {
-                EditorGUI.DrawRect(selectionRect, new Color(0, 0, .2f, .2f));
-            }
         }
 
         private static Texture2D MakeTex(int width, int height, Color col)

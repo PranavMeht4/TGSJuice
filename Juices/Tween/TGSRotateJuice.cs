@@ -4,11 +4,11 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Tween/Rotation Effect")]
-    [JuiceDescription("Rotate this gameobject smoothly")]
+    [JuiceLabel("Tween/Rotation")]
+    [JuiceDescription("Rotate one or list of gameobjects smoothly")]
     public class TGSRotateJuice : TGSJuiceBase
     {
-        public Transform TransformToRotate;
+        public Transform[] TransformsToRotate;
         public float RotationDuration = 1f;
         public Vector3 RotationAngles = Vector3.zero;
         public AnimationCurve RotationCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
@@ -32,7 +32,10 @@ namespace TGSJuice
                 {
                     float t = elapsed / RotationDuration;
                     t = RotationCurve.Evaluate(t);
-                    TransformToRotate.rotation = Quaternion.Lerp(initialRotation, targetRotation, t);
+                    foreach (var transformItem in TransformsToRotate)
+                    {
+                        transformItem.rotation = Quaternion.Lerp(initialRotation, targetRotation, t);
+                    }
 
                     elapsed += Time.deltaTime;
                     yield return null;

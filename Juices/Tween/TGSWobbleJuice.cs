@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TGSJuice
@@ -12,7 +13,7 @@ namespace TGSJuice
         public float WobbleSpeed = 1f;
         public float WobbleFrequency = 1f;
         public Vector3 WobbleDirection = Vector3.one;
-        public TGSWobbleAction WobbleAction;
+        public override Type ActionType { get { return typeof(TGSWobbleAction); } }
 
         public override void Play()
         {

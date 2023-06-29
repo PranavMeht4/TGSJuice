@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TGSJuice
@@ -12,8 +13,7 @@ namespace TGSJuice
         public float Speed = 1.0f;
         public bool ShakeVertical = true;
         public bool ShakeHorizontal = true;
-
-        public TGSCameraShakeAction TGSCameraShakeAction;
+        public override Type ActionType { get { return typeof(TGSCameraShakeAction); } }
 
         public override void Play()
         {

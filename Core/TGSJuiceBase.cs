@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TGSJuice
@@ -7,6 +8,7 @@ namespace TGSJuice
     public class TGSJuiceBase : MonoBehaviour
     {
         public TGSJuiceBase() { }
+        public virtual Type ActionType { get; }
         public virtual void Play() { }
     }
 }
