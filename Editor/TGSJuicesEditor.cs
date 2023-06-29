@@ -11,8 +11,8 @@ namespace TGSJuice
     public class TGSJuicesEditor : Editor
     {
         private List<Type> _juiceTypes;
-        private Dictionary<Type, Editor> _juiceEditors = new Dictionary<Type, Editor>();
-        private Dictionary<Type, bool> _juiceFoldouts = new Dictionary<Type, bool>();
+        private static Dictionary<Type, Editor> _juiceEditors = new Dictionary<Type, Editor>();
+        private static Dictionary<Type, bool> _juiceFoldouts = new Dictionary<Type, bool>();
 
         private void OnEnable()
         {
@@ -96,6 +96,10 @@ namespace TGSJuice
 
         private void RenderPlayAllButton(TGSJuices target)
         {
+            foreach (var item in target.juices)
+            {
+                item.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+            }
             TGSJuicesEditorStyling.DrawStyledButton("Play All", TGSJuicesEditorStyling.ButtonStyle, () => target.PlayAll());
         }
 
@@ -133,7 +137,11 @@ namespace TGSJuice
             {
                 JuiceDescriptionAttribute juiceDesc = Attribute.GetCustomAttribute(type, typeof(JuiceDescriptionAttribute)) as JuiceDescriptionAttribute;
                 if (juiceDesc != null)
-                    EditorGUILayout.HelpBox(juiceDesc.Description, MessageType.Info);
+                {
+                    // EditorGUI.DropShadowLabel(new Rect(0, 0, 0, 0), juiceDesc.Description);
+                    EditorGUILayout.LabelField(juiceDesc.Description, TGSJuicesEditorStyling.InfoStyle);
+                    // GUILayout.Label(juiceDesc.Description);
+                }
 
                 EditorGUI.indentLevel++;
                 // Only call the custom editor's OnInspectorGUI

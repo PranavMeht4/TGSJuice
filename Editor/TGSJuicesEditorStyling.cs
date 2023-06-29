@@ -8,6 +8,21 @@ namespace TGSJuice
     {
         public static List<GameObject> ObjectsToHighlight { get; } = new List<GameObject>();
 
+        // Define a style for info
+        public static GUIStyle InfoStyle
+        {
+            get
+            {
+                GUIStyle style = new GUIStyle(GUI.skin.label);
+                style.wordWrap = true;
+                style.normal.textColor = Color.white;
+                style.normal.background = MakeTex(1, 1, new Color(0.15f, 0.15f, 0.15f, .5f));
+                style.padding = new RectOffset(5, 5, 3, 3);
+                style.margin = new RectOffset(8, 8, 8, 8);
+                return style;
+            }
+        }
+
         // Define a style for button
         public static GUIStyle ButtonStyle
         {
@@ -27,6 +42,8 @@ namespace TGSJuice
             {
                 var style = new GUIStyle(EditorStyles.foldout);
                 style.font = EditorStyles.boldFont;
+                style.alignment = TextAnchor.MiddleLeft;
+                style.fontSize = 13;
                 return style;
             }
         }
@@ -37,7 +54,7 @@ namespace TGSJuice
             get
             {
                 var style = new GUIStyle(EditorStyles.popup);
-                style.fontSize = 12;
+                style.fontSize = 13;
                 style.alignment = TextAnchor.MiddleLeft;
                 return style;
             }
@@ -77,6 +94,19 @@ namespace TGSJuice
             {
                 EditorGUI.DrawRect(selectionRect, new Color(0, 0, .2f, .2f));
             }
+        }
+
+        private static Texture2D MakeTex(int width, int height, Color col)
+        {
+            Color[] pix = new Color[width * height];
+            for (int i = 0; i < pix.Length; ++i)
+            {
+                pix[i] = col;
+            }
+            Texture2D result = new Texture2D(width, height);
+            result.SetPixels(pix);
+            result.Apply();
+            return result;
         }
     }
 }
