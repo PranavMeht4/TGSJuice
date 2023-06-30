@@ -3,10 +3,11 @@ using UnityEngine;
 
 namespace TGSJuice
 {
-    public class TGSJuicesEditorStyling
+    public static class TGSJuicesEditorStyling
     {
-        // Define a style for info
-        public static GUIStyle InfoStyle
+        // GUI style proprities
+
+        private static GUIStyle InfoStyle
         {
             get
             {
@@ -21,8 +22,7 @@ namespace TGSJuice
             }
         }
 
-        // Define a style for button
-        public static GUIStyle ButtonStyle
+        private static GUIStyle ButtonStyle
         {
             get
             {
@@ -33,8 +33,7 @@ namespace TGSJuice
             }
         }
 
-        // Define a style for foldout
-        public static GUIStyle FoldoutStyle
+        private static GUIStyle FoldoutStyle
         {
             get
             {
@@ -46,8 +45,7 @@ namespace TGSJuice
             }
         }
 
-        // Define a style for popup
-        public static GUIStyle PopupStyle
+        private static GUIStyle PopupStyle
         {
             get
             {
@@ -58,12 +56,19 @@ namespace TGSJuice
             }
         }
 
-        // GUI Drawing Methods
-        public static void DrawStyledButton(string label, GUIStyle style, System.Action onClick)
+
+        // GUI drawing methods
+
+        internal static void DrawStyledDescription(string description)
+        {
+            EditorGUILayout.LabelField(description, InfoStyle);
+        }
+
+        public static void DrawStyledButton(string label, System.Action onClick)
         {
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(label, style, GUILayout.Width(100), GUILayout.Height(20)))
+            if (GUILayout.Button(label, ButtonStyle, GUILayout.Width(100), GUILayout.Height(20)))
             {
                 onClick?.Invoke();
             }
@@ -71,17 +76,17 @@ namespace TGSJuice
             EditorGUILayout.EndHorizontal();
         }
 
-        public static bool DrawStyledFoldout(bool foldout, string label, GUIStyle style)
+        public static bool DrawStyledFoldout(bool foldout, string label)
         {
             EditorGUILayout.BeginVertical(GUI.skin.box);
-            foldout = EditorGUILayout.Foldout(foldout, label, true, style);
+            foldout = EditorGUILayout.Foldout(foldout, label, true, FoldoutStyle);
             EditorGUILayout.EndVertical();
             return foldout;
         }
 
-        public static int DrawStyledPopup(int selectedIndex, string[] options, GUIStyle style)
+        public static int DrawStyledPopup(int selectedIndex, string[] options)
         {
-            return EditorGUILayout.Popup(selectedIndex, options, style);
+            return EditorGUILayout.Popup(selectedIndex, options, PopupStyle);
         }
 
         private static Texture2D MakeTex(int width, int height, Color col)

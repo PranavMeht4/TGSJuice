@@ -12,8 +12,8 @@ namespace TGSJuice
     {
         private List<Type> _juiceTypes;
         private static Dictionary<int, Editor> _juiceEditors = new Dictionary<int, Editor>();
-        private static Dictionary<int, bool> _juiceFoldouts = new Dictionary<int, bool>();
         private List<string> _popupOptions = new List<string>() { "Add new juice..." };
+        private const string FoldOutStateKeyPrefix = "TGSJuice_FoldOut_";
 
         private void OnEnable()
         {
@@ -73,11 +73,10 @@ namespace TGSJuice
             Type type = juice.GetType();
 
             CreateEditorIfNeeded(juice, instanceID);
-            InitializeFoldoutStateIfNeeded(instanceID);
 
             DrawFoldoutLabel(type, instanceID);
 
-            if (_juiceFoldouts[instanceID])
+            if (EditorPrefs.GetBool(FoldOutStateKeyPrefix + instanceID))
             {
                 DrawDescription(type);
                 DrawFields(instanceID);
@@ -98,11 +97,6 @@ namespace TGSJuice
             }
         }
 
-        private void InitializeFoldoutStateIfNeeded(int instanceID)
-        {
-            _juiceFoldouts.TryAdd(instanceID, false);
-        }
-
         private void DrawFoldoutLabel(Type type, int instanceID)
         {
             JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
@@ -112,14 +106,17 @@ namespace TGSJuice
                 string[] labelParts = juiceLabelAttr.Label.Split('/');
                 label = labelParts.Length > 1 ? labelParts[1] : labelParts[0];
             }
-            _juiceFoldouts[instanceID] = TGSJuicesEditorStyling.DrawStyledFoldout(_juiceFoldouts[instanceID], label, TGSJuicesEditorStyling.FoldoutStyle);
+
+            var foldoutState = EditorPrefs.GetBool(FoldOutStateKeyPrefix + instanceID);
+            foldoutState = TGSJuicesEditorStyling.DrawStyledFoldout(foldoutState, label);
+            EditorPrefs.SetBool(FoldOutStateKeyPrefix + instanceID, foldoutState);
         }
 
         private void DrawDescription(Type type)
         {
             JuiceDescriptionAttribute juiceDesc = Attribute.GetCustomAttribute(type, typeof(JuiceDescriptionAttribute)) as JuiceDescriptionAttribute;
             if (juiceDesc != null)
-                EditorGUILayout.LabelField(juiceDesc.Description, TGSJuicesEditorStyling.InfoStyle);
+                TGSJuicesEditorStyling.DrawStyledDescription(juiceDesc.Description);
         }
 
         private void DrawFields(int instanceID)
@@ -131,12 +128,12 @@ namespace TGSJuice
 
         private void DrawPlayButton(TGSJuiceBase juice)
         {
-            TGSJuicesEditorStyling.DrawStyledButton("Play", TGSJuicesEditorStyling.ButtonStyle, () => juice.Play());
+            TGSJuicesEditorStyling.DrawStyledButton("Play", () => juice.Play());
         }
 
         private void DrawRemoveButton(TGSJuiceBase juice, TGSJuices target)
         {
-            TGSJuicesEditorStyling.DrawStyledButton("Remove", TGSJuicesEditorStyling.ButtonStyle, () =>
+            TGSJuicesEditorStyling.DrawStyledButton("Remove", () =>
             {
                 Undo.RecordObject(target, "Remove Juice");
                 target.juices.Remove(juice);
@@ -146,14 +143,14 @@ namespace TGSJuice
 
         private void DrawListenersButton(TGSJuiceBase juice)
         {
-            TGSJuicesEditorStyling.DrawStyledButton("Listners", TGSJuicesEditorStyling.PopupStyle, () =>
+            TGSJuicesEditorStyling.DrawStyledButton("Listners", () =>
                 StringListSearchWindow.OpenSearchWindow(juice.ActionType));
         }
         #endregion
 
         private void HandleAddJuicePopup(TGSJuices target)
         {
-            int selectedJuiceType = TGSJuicesEditorStyling.DrawStyledPopup(0, _popupOptions.ToArray(), TGSJuicesEditorStyling.PopupStyle);
+            int selectedJuiceType = TGSJuicesEditorStyling.DrawStyledPopup(0, _popupOptions.ToArray());
 
             if (selectedJuiceType > 0)
             {
@@ -179,7 +176,7 @@ namespace TGSJuice
             {
                 item.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
             }
-            TGSJuicesEditorStyling.DrawStyledButton("Play All", TGSJuicesEditorStyling.ButtonStyle, () => target.PlayAll());
+            TGSJuicesEditorStyling.DrawStyledButton("Play All", () => target.PlayAll());
         }
     }
 }
