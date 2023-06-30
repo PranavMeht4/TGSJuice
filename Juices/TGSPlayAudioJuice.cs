@@ -7,7 +7,7 @@ namespace TGSJuice
     [JuiceDescription("Play any audio clip")]
     public class TGSPlayAudioJuice : TGSJuiceBase
     {
-        public float Volume;
+        public float Volume = 1;
         public AudioClip AudioClip;
 
         private GameObject _audioSourceObject;
@@ -21,11 +21,12 @@ namespace TGSJuice
                 {
                     _audioSourceObject = new GameObject("AudioSource");
                     _audioSource = _audioSourceObject.AddComponent<AudioSource>();
+                    _audioSource.playOnAwake = false;
                 }
 
                 _audioSource.clip = AudioClip;
                 _audioSource.volume = Volume;
-                _audioSource.Play();
+                _audioSource.PlayOneShot(AudioClip);
             }
             else
             {
