@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace TGSJuice
@@ -15,17 +13,40 @@ namespace TGSJuice
         private List<Type> _juiceTypes;
         private static Dictionary<int, Editor> _juiceEditors = new Dictionary<int, Editor>();
         private static Dictionary<int, bool> _juiceFoldouts = new Dictionary<int, bool>();
+        private List<string> _popupOptions = new List<string>() { "Add new juice..." };
 
         private void OnEnable()
         {
             FindJuiceTypes();
-            // EditorApplication.hierarchyWindowItemOnGUI += HierarchWindowOnGUI;
+            InitalizePopupData();
         }
 
-        // private void OnDisable()
-        // {
-        //     EditorApplication.hierarchyWindowItemOnGUI -= HierarchWindowOnGUI;
-        // }
+        private void FindJuiceTypes()
+        {
+            _juiceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                           from assemblyType in domainAssembly.GetTypes()
+                           where assemblyType.IsSubclassOf(typeof(TGSJuiceBase))
+                           select assemblyType).ToList();
+        }
+
+        private void InitalizePopupData()
+        {
+            Dictionary<string, List<string>> categorizedOptions = new Dictionary<string, List<string>>();
+            foreach (var type in _juiceTypes)
+            {
+                JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
+                string juiceLabel = juiceLabelAttr?.Label ?? type.Name;
+                string category = juiceLabel.Split('/')[0];
+                if (!categorizedOptions.TryGetValue(category, out List<string> categoryOptions))
+                {
+                    categoryOptions = new List<string>();
+                    categorizedOptions[category] = categoryOptions;
+                }
+                categoryOptions.Add(juiceLabel);
+            }
+
+            _popupOptions.AddRange(categorizedOptions.SelectMany(category => category.Value));
+        }
 
         public override void OnInspectorGUI()
         {
@@ -45,38 +66,94 @@ namespace TGSJuice
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void FindJuiceTypes()
+        #region RenderJuiceEditor
+        private void RenderJuiceEditor(TGSJuiceBase juice, TGSJuices target)
         {
-            _juiceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                           from assemblyType in domainAssembly.GetTypes()
-                           where assemblyType.IsSubclassOf(typeof(TGSJuiceBase))
-                           select assemblyType).ToList();
+            int instanceID = juice.GetInstanceID();
+            Type type = juice.GetType();
+
+            CreateEditorIfNeeded(juice, instanceID);
+            InitializeFoldoutStateIfNeeded(instanceID);
+
+            DrawFoldoutLabel(type, instanceID);
+
+            if (_juiceFoldouts[instanceID])
+            {
+                DrawDescription(type);
+                DrawFields(instanceID);
+                GUILayout.BeginHorizontal();
+                DrawPlayButton(juice);
+                DrawRemoveButton(juice, target);
+                DrawListenersButton(juice);
+                GUILayout.EndHorizontal();
+            }
         }
+
+        private void CreateEditorIfNeeded(TGSJuiceBase juice, int instanceID)
+        {
+            if (!_juiceEditors.TryGetValue(instanceID, out Editor editor))
+            {
+                CreateCachedEditor(juice, null, ref editor);
+                _juiceEditors[instanceID] = editor;
+            }
+        }
+
+        private void InitializeFoldoutStateIfNeeded(int instanceID)
+        {
+            _juiceFoldouts.TryAdd(instanceID, false);
+        }
+
+        private void DrawFoldoutLabel(Type type, int instanceID)
+        {
+            JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
+            string label = type.Name;
+            if (juiceLabelAttr != null)
+            {
+                string[] labelParts = juiceLabelAttr.Label.Split('/');
+                label = labelParts.Length > 1 ? labelParts[1] : labelParts[0];
+            }
+            _juiceFoldouts[instanceID] = TGSJuicesEditorStyling.DrawStyledFoldout(_juiceFoldouts[instanceID], label, TGSJuicesEditorStyling.FoldoutStyle);
+        }
+
+        private void DrawDescription(Type type)
+        {
+            JuiceDescriptionAttribute juiceDesc = Attribute.GetCustomAttribute(type, typeof(JuiceDescriptionAttribute)) as JuiceDescriptionAttribute;
+            if (juiceDesc != null)
+                EditorGUILayout.LabelField(juiceDesc.Description, TGSJuicesEditorStyling.InfoStyle);
+        }
+
+        private void DrawFields(int instanceID)
+        {
+            EditorGUI.indentLevel++;
+            _juiceEditors[instanceID].OnInspectorGUI();
+            EditorGUI.indentLevel--;
+        }
+
+        private void DrawPlayButton(TGSJuiceBase juice)
+        {
+            TGSJuicesEditorStyling.DrawStyledButton("Play", TGSJuicesEditorStyling.ButtonStyle, () => juice.Play());
+        }
+
+        private void DrawRemoveButton(TGSJuiceBase juice, TGSJuices target)
+        {
+            TGSJuicesEditorStyling.DrawStyledButton("Remove", TGSJuicesEditorStyling.ButtonStyle, () =>
+            {
+                Undo.RecordObject(target, "Remove Juice");
+                target.juices.Remove(juice);
+                Undo.DestroyObjectImmediate(juice);
+            });
+        }
+
+        private void DrawListenersButton(TGSJuiceBase juice)
+        {
+            TGSJuicesEditorStyling.DrawStyledButton("Listners", TGSJuicesEditorStyling.PopupStyle, () =>
+                StringListSearchWindow.OpenSearchWindow(juice.ActionType));
+        }
+        #endregion
 
         private void HandleAddJuicePopup(TGSJuices target)
         {
-            Dictionary<string, List<string>> categorizedOptions = new Dictionary<string, List<string>>();
-            foreach (var type in _juiceTypes)
-            {
-                JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
-                string juiceLabel = juiceLabelAttr != null ? juiceLabelAttr.Label : type.Name;
-                string category = juiceLabel.Split('/')[0];
-                if (!categorizedOptions.ContainsKey(category))
-                {
-                    categorizedOptions[category] = new List<string>();
-                }
-                categorizedOptions[category].Add(juiceLabel);
-            }
-
-            List<string> options = new List<string>() { "Add new juice..." };
-            foreach (var category in categorizedOptions.Keys)
-            {
-                foreach (var juice in categorizedOptions[category])
-                {
-                    options.Add(juice);
-                }
-            }
-            int selectedJuiceType = TGSJuicesEditorStyling.DrawStyledPopup(0, options.ToArray(), TGSJuicesEditorStyling.PopupStyle);
+            int selectedJuiceType = TGSJuicesEditorStyling.DrawStyledPopup(0, _popupOptions.ToArray(), TGSJuicesEditorStyling.PopupStyle);
 
             if (selectedJuiceType > 0)
             {
@@ -88,11 +165,10 @@ namespace TGSJuice
                 Undo.RecordObject(target, "Add Juice");
                 target.juices.Add(newJuice);
 
-                if (!_juiceEditors.ContainsKey(instanceID))
+                if (!_juiceEditors.TryGetValue(instanceID, out Editor editor))
                 {
-                    Editor _newJuiceEditor = null;
-                    CreateCachedEditor(newJuice, null, ref _newJuiceEditor);
-                    _juiceEditors[instanceID] = _newJuiceEditor;
+                    CreateCachedEditor(newJuice, null, ref editor);
+                    _juiceEditors[instanceID] = editor;
                 }
             }
         }
@@ -104,65 +180,6 @@ namespace TGSJuice
                 item.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
             }
             TGSJuicesEditorStyling.DrawStyledButton("Play All", TGSJuicesEditorStyling.ButtonStyle, () => target.PlayAll());
-        }
-
-        private void RenderJuiceEditor(TGSJuiceBase juice, TGSJuices target)
-        {
-            int instanceID = juice.GetInstanceID();
-
-            Type type = juice.GetType();
-
-            // If the editor for this type doesn't exist, create it
-            if (!_juiceEditors.ContainsKey(instanceID))
-            {
-                Editor editor = null;
-                CreateCachedEditor(juice, null, ref editor);
-                _juiceEditors[instanceID] = editor;
-            }
-
-            // If the foldout state for this type doesn't exist, initialize it to 'false'
-            if (!_juiceFoldouts.ContainsKey(instanceID))
-            {
-                _juiceFoldouts[instanceID] = false;
-            }
-
-            JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
-
-            string label = type.Name;
-            if (juiceLabelAttr != null)
-            {
-                string[] labelParts = juiceLabelAttr.Label.Split('/');
-                label = labelParts.Length > 1 ? labelParts[1] : labelParts[0];
-            }
-
-            _juiceFoldouts[instanceID] = TGSJuicesEditorStyling.DrawStyledFoldout(_juiceFoldouts[instanceID], label, TGSJuicesEditorStyling.FoldoutStyle);
-
-            // Create the buttons
-            if (_juiceFoldouts[instanceID])
-            {
-                JuiceDescriptionAttribute juiceDesc = Attribute.GetCustomAttribute(type, typeof(JuiceDescriptionAttribute)) as JuiceDescriptionAttribute;
-                if (juiceDesc != null)
-                {
-                    EditorGUILayout.LabelField(juiceDesc.Description, TGSJuicesEditorStyling.InfoStyle);
-                }
-
-                EditorGUI.indentLevel++;
-                // Only call the custom editor's OnInspectorGUI
-                _juiceEditors[instanceID].OnInspectorGUI();
-                EditorGUI.indentLevel--;
-                EditorGUILayout.BeginHorizontal();
-                TGSJuicesEditorStyling.DrawStyledButton("Play", TGSJuicesEditorStyling.ButtonStyle, () => juice.Play());
-                TGSJuicesEditorStyling.DrawStyledButton("Remove", TGSJuicesEditorStyling.ButtonStyle, () =>
-                {
-                    Undo.RecordObject(target, "Remove Juice");
-                    target.juices.Remove(juice);
-                    Undo.DestroyObjectImmediate(juice);
-                });
-                TGSJuicesEditorStyling.DrawStyledButton("Listners", TGSJuicesEditorStyling.PopupStyle, () =>
-                    StringListSearchWindow.OpenSearchWindow(juice.ActionType));
-
-                EditorGUILayout.EndHorizontal();
-            }
         }
     }
 }
