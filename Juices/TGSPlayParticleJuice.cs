@@ -3,7 +3,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Play Particle")]
+    [JuiceLabel("Play Particle", "ParticleSystem Icon")]
     [JuiceDescription("Play assigned particle effect")]
     public class TGSPlayParticleJuice : TGSJuiceBase
     {

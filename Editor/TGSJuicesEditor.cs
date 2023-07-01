@@ -11,7 +11,7 @@ namespace TGSJuice
     public class TGSJuicesEditor : Editor
     {
         private List<Type> _juiceTypes;
-        private static Dictionary<int, Editor> _juiceEditors = new Dictionary<int, Editor>();
+        private Dictionary<int, Editor> _juiceEditors = new Dictionary<int, Editor>();
         private List<string> _popupOptions = new List<string>() { "Add new juice..." };
         private const string FoldOutStateKeyPrefix = "TGSJuice_FoldOut_";
 
@@ -74,18 +74,24 @@ namespace TGSJuice
 
             CreateEditorIfNeeded(juice, instanceID);
 
-            DrawFoldoutLabel(type, instanceID);
-
-            if (EditorPrefs.GetBool(FoldOutStateKeyPrefix + instanceID))
+            GUILayout.BeginVertical(TGSJuicesEditorStyling.BackgroundStyle);
             {
-                DrawDescription(type);
-                DrawFields(instanceID);
-                GUILayout.BeginHorizontal();
-                DrawPlayButton(juice);
-                DrawRemoveButton(juice, target);
-                DrawListenersButton(juice);
-                GUILayout.EndHorizontal();
+                DrawFoldoutLabel(type, instanceID, target, juice);
+
+                if (EditorPrefs.GetBool(FoldOutStateKeyPrefix + instanceID))
+                {
+                    DrawDescription(type);
+                    DrawFields(instanceID);
+                    GUILayout.Space(10);
+                    GUILayout.BeginHorizontal();
+                    {
+                        DrawPlayButton(juice);
+                        DrawListenersButton(juice);
+                    }
+                    GUILayout.EndHorizontal();
+                }
             }
+            GUILayout.EndVertical();
         }
 
         private void CreateEditorIfNeeded(TGSJuiceBase juice, int instanceID)
@@ -97,7 +103,7 @@ namespace TGSJuice
             }
         }
 
-        private void DrawFoldoutLabel(Type type, int instanceID)
+        private void DrawFoldoutLabel(Type type, int instanceID, TGSJuices target, TGSJuiceBase juice)
         {
             JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
             string label = type.Name;
@@ -108,8 +114,15 @@ namespace TGSJuice
             }
 
             var foldoutState = EditorPrefs.GetBool(FoldOutStateKeyPrefix + instanceID);
-            foldoutState = TGSJuicesEditorStyling.DrawStyledFoldout(foldoutState, label);
+            foldoutState = TGSJuicesEditorStyling.DrawStyledFoldout(foldoutState, label, juiceLabelAttr.Icon, () => RemoveAction(target, juice));
             EditorPrefs.SetBool(FoldOutStateKeyPrefix + instanceID, foldoutState);
+        }
+
+        private void RemoveAction(TGSJuices target, TGSJuiceBase juice)
+        {
+            Undo.RecordObject(target, "Remove Juice");
+            target.juices.Remove(juice);
+            Undo.DestroyObjectImmediate(juice);
         }
 
         private void DrawDescription(Type type)
@@ -129,16 +142,6 @@ namespace TGSJuice
         private void DrawPlayButton(TGSJuiceBase juice)
         {
             TGSJuicesEditorStyling.DrawStyledButton("Play", () => juice.Play());
-        }
-
-        private void DrawRemoveButton(TGSJuiceBase juice, TGSJuices target)
-        {
-            TGSJuicesEditorStyling.DrawStyledButton("Remove", () =>
-            {
-                Undo.RecordObject(target, "Remove Juice");
-                target.juices.Remove(juice);
-                Undo.DestroyObjectImmediate(juice);
-            });
         }
 
         private void DrawListenersButton(TGSJuiceBase juice)

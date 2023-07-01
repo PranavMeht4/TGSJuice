@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Camera/Camera Shake")]
+    [JuiceLabel("Camera/Camera Shake", "Camera Icon")]
     [JuiceDescription("Apply shake effect to the camera. Ensure that the camera has a <color=#ADD8E6>TGSCameraShakeAction</color> component attached.")]
     public class TGSCameraShakeJuice : TGSJuiceBase
     {

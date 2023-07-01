@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Camera/Camera Zoom")]
+    [JuiceLabel("Camera/Camera Zoom", "Camera Icon")]
     [JuiceDescription("Apply zoom effect to the camera. Ensure that the camera has a <color=#ADD8E6>TGSCameraZoomAction</color> component attached.")]
     public class TGSCameraZoomJuice : TGSJuiceBase
     {

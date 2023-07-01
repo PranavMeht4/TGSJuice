@@ -5,7 +5,7 @@ namespace TGSJuice
 {
     [System.Serializable]
     [AddComponentMenu("")]
-    [JuiceLabel("Time/Slow Motion")]
+    [JuiceLabel("Time/Slow Motion", "d_Animation.LastKey")]
     [JuiceDescription("Trigger slow motion effect /n" + "set timeSpeed to 0 to enable freeze frame effect")]
     public class TGSSlowMoJuice : TGSJuiceBase
     {

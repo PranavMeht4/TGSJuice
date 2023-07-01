@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace TGSJuice
                 style.richText = true;
                 style.wordWrap = true;
                 style.normal.textColor = Color.white;
-                style.normal.background = MakeTex(1, 1, new Color(0.15f, 0.15f, 0.15f, .5f));
+                style.normal.background = MakeTex(1, 1, new Color(0.5f, 0.5f, 0.5f, .3f));
                 style.padding = new RectOffset(5, 5, 3, 3);
                 style.margin = new RectOffset(8, 8, 8, 8);
                 return style;
@@ -41,6 +42,7 @@ namespace TGSJuice
                 style.font = EditorStyles.boldFont;
                 style.alignment = TextAnchor.MiddleLeft;
                 style.fontSize = 13;
+                style.fontStyle = FontStyle.Bold;
                 return style;
             }
         }
@@ -56,6 +58,16 @@ namespace TGSJuice
             }
         }
 
+        public static GUIStyle BackgroundStyle
+        {
+            get
+            {
+                var style = new GUIStyle(GUI.skin.box);
+                style.normal.background = MakeTex(1, 1, new Color(0.1f, 0.1f, 0.1f, .25f));
+                return style;
+            }
+        }
+
 
         // GUI drawing methods
 
@@ -64,23 +76,42 @@ namespace TGSJuice
             EditorGUILayout.LabelField(description, InfoStyle);
         }
 
-        public static void DrawStyledButton(string label, System.Action onClick)
+        public static void DrawStyledButton(string label, Action onClick)
         {
             EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button(label, ButtonStyle, GUILayout.Width(100), GUILayout.Height(20)))
             {
-                onClick?.Invoke();
+                GUILayout.FlexibleSpace();
+                {
+                    if (GUILayout.Button(label, ButtonStyle, GUILayout.Width(100), GUILayout.Height(20)))
+                        onClick?.Invoke();
+                }
+                GUILayout.FlexibleSpace();
             }
-            GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
         }
 
-        public static bool DrawStyledFoldout(bool foldout, string label)
+        public static bool DrawStyledFoldout(bool foldout, string label, string icon, Action onClick)
         {
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-            foldout = EditorGUILayout.Foldout(foldout, label, true, FoldoutStyle);
-            EditorGUILayout.EndVertical();
+            GUIStyle backgroundStyle = new GUIStyle(GUI.skin.box);
+            backgroundStyle.normal.background = MakeTex(1, 1, new Color(0.1f, 0.1f, 0.1f, .4f));
+
+            EditorGUI.indentLevel++;
+            GUILayout.BeginVertical(backgroundStyle);
+            {
+                GUILayout.BeginHorizontal();
+                {
+                    GUIContent content = new GUIContent($"   {label}", EditorGUIUtility.IconContent(icon).image);
+                    foldout = EditorGUILayout.Foldout(foldout, content, true, FoldoutStyle);
+                    if (GUILayout.RepeatButton("X", GUILayout.MaxWidth(20)))
+                    {
+                        onClick?.Invoke();
+                    }
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
+            EditorGUI.indentLevel--;
+
             return foldout;
         }
 

@@ -43,7 +43,7 @@ public class Cube : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        _juiceOnGroundHit.PlayAll();
         isGrounded = true;
+        _juiceOnGroundHit.PlayAll();
     }
 }

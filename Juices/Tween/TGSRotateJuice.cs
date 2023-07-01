@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Tween/Rotation")]
+    [JuiceLabel("Tween/Rotation", "Transform Icon")]
     [JuiceDescription("Rotate one or list of gameobjects smoothly")]
     public class TGSRotateJuice : TGSJuiceBase
     {

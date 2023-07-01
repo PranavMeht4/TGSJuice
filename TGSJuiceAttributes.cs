@@ -6,10 +6,12 @@ namespace TGSJuice
     public class JuiceLabelAttribute : Attribute
     {
         public string Label { get; private set; }
+        public string Icon { get; private set; }
 
-        public JuiceLabelAttribute(string label)
+        public JuiceLabelAttribute(string label, string icon)
         {
             Label = label;
+            Icon = icon;
         }
     }
 

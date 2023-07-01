@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Tween/Object Wobble")]
+    [JuiceLabel("Tween/Object Wobble", "Transform Icon")]
     [JuiceDescription("Applies a wobble effect to an object. Ensure that the target has a <color=#ADD8E6>TGSWobbleAction</color> component attached.")]
     public class TGSWobbleJuice : TGSJuiceBase
     {

@@ -72,12 +72,10 @@ namespace TGSJuice
             private void OnGUI()
             {
                 _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
+                GUILayout.Space(20);
                 foreach (var listener in StringListSearchWindow._listeners.Where(l => l != null).OrderBy(l => l.name))
                 {
-                    if (GUILayout.Button(listener.name))
-                    {
-                        Selection.activeGameObject = listener.gameObject;
-                    }
+                    EditorGUILayout.ObjectField(listener.name, listener, typeof(GameObject), true);
                 }
                 GUILayout.EndScrollView();
 
