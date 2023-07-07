@@ -7,7 +7,7 @@ namespace TGSJuice
 {
     [RequireComponent(typeof(CanvasGroup))]
     [RequireComponent(typeof(Image))]
-    public class TGSFlashAction : TGSActionBase<TGSFlashActionParam>
+    public class TGSUIFlashAction : TGSActionBase<TGSFlashActionParam>
     {
         public static UnityAction<float, float, Color> CameraFlashInvoked;
 

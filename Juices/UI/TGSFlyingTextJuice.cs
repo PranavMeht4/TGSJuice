@@ -1,18 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class TGSFlyingTextJuice : MonoBehaviour
+namespace TGSJuice
 {
-    // Start is called before the first frame update
-    void Start()
+    public class TGSFlyingTextJuice : MonoBehaviour
     {
-        
-    }
+        // [SerializeField] private Transform textTransfrom;
+        // [SerializeField] private Transform target;
+        // [SerializeField] private Color color;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // public override void Play()
+        // {
+        //     textTransfrom.position = Camera.main.WorldToScreenPoint(target.position);
+        // }
     }
 }

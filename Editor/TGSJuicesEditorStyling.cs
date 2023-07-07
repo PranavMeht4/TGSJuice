@@ -1,5 +1,6 @@
 using System;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace TGSJuice
@@ -115,9 +116,13 @@ namespace TGSJuice
             return foldout;
         }
 
-        public static int DrawStyledPopup(int selectedIndex, string[] options)
+        public static void DrawStyledSearchWindow(Action<Type> onClick)
         {
-            return EditorGUILayout.Popup(selectedIndex, options, PopupStyle);
+            if (GUILayout.Button("Add new juice...", EditorStyles.popup))
+            {
+                SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), ScriptableObject.CreateInstance<AddJuiceSearchWindow>());
+                AddJuiceSearchWindow.OnClickJuiceType(onClick);
+            }
         }
 
         private static Texture2D MakeTex(int width, int height, Color col)

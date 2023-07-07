@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,64 +9,30 @@ namespace TGSJuice
     [CustomEditor(typeof(TGSJuices))]
     public class TGSJuicesEditor : Editor
     {
-        private List<Type> _juiceTypes;
         private Dictionary<int, Editor> _juiceEditors = new Dictionary<int, Editor>();
-        private List<string> _popupOptions = new List<string>() { "Add new juice..." };
         private const string FoldOutStateKeyPrefix = "TGSJuice_FoldOut_";
-
-        private void OnEnable()
-        {
-            FindJuiceTypes();
-            InitalizePopupData();
-        }
-
-        private void FindJuiceTypes()
-        {
-            _juiceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                           from assemblyType in domainAssembly.GetTypes()
-                           where assemblyType.IsSubclassOf(typeof(TGSJuiceBase))
-                           select assemblyType).ToList();
-        }
-
-        private void InitalizePopupData()
-        {
-            Dictionary<string, List<string>> categorizedOptions = new Dictionary<string, List<string>>();
-            foreach (var type in _juiceTypes)
-            {
-                JuiceLabelAttribute juiceLabelAttr = Attribute.GetCustomAttribute(type, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
-                string juiceLabel = juiceLabelAttr?.Label ?? type.Name;
-                string category = juiceLabel.Split('/')[0];
-                if (!categorizedOptions.TryGetValue(category, out List<string> categoryOptions))
-                {
-                    categoryOptions = new List<string>();
-                    categorizedOptions[category] = categoryOptions;
-                }
-                categoryOptions.Add(juiceLabel);
-            }
-
-            _popupOptions.AddRange(categorizedOptions.SelectMany(category => category.Value));
-        }
+        private TGSJuices targetTGSJuices;
 
         public override void OnInspectorGUI()
         {
-            TGSJuices target = (TGSJuices)base.target;
+            targetTGSJuices = (TGSJuices)base.target;
 
-            foreach (var juice in target.gameObject.GetComponents<TGSJuiceBase>())
+            foreach (var juice in targetTGSJuices.GetComponents<TGSJuiceBase>())
             {
-                RenderJuiceEditor(juice, target);
+                RenderJuiceEditor(juice);
             }
 
             GUILayout.Space(10);
             GUILayout.BeginHorizontal();
-            HandleAddJuicePopup(target);
-            RenderPlayAllButton(target);
+            HandleAddJuicePopup();
+            RenderPlayAllButton();
             GUILayout.EndHorizontal();
 
             serializedObject.ApplyModifiedProperties();
         }
 
         #region RenderJuiceEditor
-        private void RenderJuiceEditor(TGSJuiceBase juice, TGSJuices target)
+        private void RenderJuiceEditor(TGSJuiceBase juice)
         {
             int instanceID = juice.GetInstanceID();
             Type type = juice.GetType();
@@ -76,8 +41,13 @@ namespace TGSJuice
 
             GUILayout.BeginVertical(TGSJuicesEditorStyling.BackgroundStyle);
             {
-                DrawFoldoutLabel(type, instanceID, target, juice);
+                DrawFoldoutLabel(type, instanceID, targetTGSJuices, juice);
 
+                if (!_juiceEditors.ContainsKey(instanceID))
+                {
+                    GUILayout.EndVertical();
+                    return;
+                }
                 if (EditorPrefs.GetBool(FoldOutStateKeyPrefix + instanceID))
                 {
                     DrawDescription(type);
@@ -120,7 +90,9 @@ namespace TGSJuice
 
         private void RemoveAction(TGSJuices target, TGSJuiceBase juice)
         {
+            GUIUtility.hotControl = 0;
             Undo.RecordObject(target, "Remove Juice");
+            _juiceEditors.Remove(juice.GetInstanceID());
             target.juices.Remove(juice);
             Undo.DestroyObjectImmediate(juice);
         }
@@ -147,39 +119,39 @@ namespace TGSJuice
         private void DrawListenersButton(TGSJuiceBase juice)
         {
             TGSJuicesEditorStyling.DrawStyledButton("Listners", () =>
-                StringListSearchWindow.OpenSearchWindow(juice.ActionType));
+                ListnerWindow.ShowWindow(juice.ActionType));
         }
         #endregion
 
-        private void HandleAddJuicePopup(TGSJuices target)
+        private void HandleAddJuicePopup()
         {
-            int selectedJuiceType = TGSJuicesEditorStyling.DrawStyledPopup(0, _popupOptions.ToArray());
+            TGSJuicesEditorStyling.DrawStyledSearchWindow((Type type) => AddSelectedJuice(type));
+        }
 
-            if (selectedJuiceType > 0)
+        private void AddSelectedJuice(Type type)
+        {
+            var newJuice = Undo.AddComponent(targetTGSJuices.gameObject, type) as TGSJuiceBase;
+
+            newJuice.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+            int instanceID = newJuice.GetInstanceID();
+
+            Undo.RecordObject(target, "Add Juice");
+            targetTGSJuices.juices.Add(newJuice);
+
+            if (!_juiceEditors.TryGetValue(instanceID, out Editor editor))
             {
-                Type selectedType = _juiceTypes[selectedJuiceType - 1];
-                var newJuice = Undo.AddComponent(target.gameObject, selectedType) as TGSJuiceBase;
-                newJuice.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
-                int instanceID = newJuice.GetInstanceID();
-
-                Undo.RecordObject(target, "Add Juice");
-                target.juices.Add(newJuice);
-
-                if (!_juiceEditors.TryGetValue(instanceID, out Editor editor))
-                {
-                    CreateCachedEditor(newJuice, null, ref editor);
-                    _juiceEditors[instanceID] = editor;
-                }
+                CreateCachedEditor(newJuice, null, ref editor);
+                _juiceEditors[instanceID] = editor;
             }
         }
 
-        private void RenderPlayAllButton(TGSJuices target)
+        private void RenderPlayAllButton()
         {
-            foreach (var item in target.juices)
+            foreach (var item in targetTGSJuices.juices)
             {
                 item.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
             }
-            TGSJuicesEditorStyling.DrawStyledButton("Play All", () => target.PlayAll());
+            TGSJuicesEditorStyling.DrawStyledButton("Play All", () => targetTGSJuices.PlayAll());
         }
     }
 }

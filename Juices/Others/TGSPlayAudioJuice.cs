@@ -3,7 +3,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Play Sound", "AudioSource Icon")]
+    [JuiceLabel("Others/Play Sound", "AudioSource Icon")]
     [JuiceDescription("Play any audio clip")]
     public class TGSPlayAudioJuice : TGSJuiceBase
     {

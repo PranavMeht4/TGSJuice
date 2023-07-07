@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TGSJuice
 {
     [AddComponentMenu("")]
-    [JuiceLabel("Flash Renderer", "MeshRenderer Icon")]
+    [JuiceLabel("Others/Flash Renderer", "MeshRenderer Icon")]
     [JuiceDescription("Flashes a renderer color over time.")]
     public class TGSFlashRendererJuice : TGSJuiceBase
     {
