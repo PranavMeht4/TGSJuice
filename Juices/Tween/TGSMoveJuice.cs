@@ -1,45 +1,48 @@
-using System.Collections;
 using UnityEngine;
+using DG.Tweening;
 
 namespace TGSJuice
 {
     [AddComponentMenu("")]
     [JuiceLabel("Tween/Move", "Transform Icon")]
-    [JuiceDescription("Move one or list of gameobjects smoothly")]
+    [JuiceDescription("Move gameobject smoothly")]
     public class TGSMoveJuice : TGSJuiceBase
     {
         public Transform TransformToMove;
-        public float MoveDuration = 1f;
+        public bool IsLocal = false;
         public Vector3 MovePositions = Vector3.zero;
-        public AnimationCurve RotationCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
-        public int LoopCount = 1;
+        public float MoveDuration = .2f;
+        public Ease MoveEase = Ease.Linear;
+        public bool Loop = false;
+        [HideIfFalse("Loop")]
+        public int LoopCount = 0;
+        [HideIfFalse("Loop")]
+        public LoopType LoopType = LoopType.Restart;
+        public bool AutoKillOnComplete = true;
+        public System.Action OnComplete;
+
+        private Tween moveTween;
 
         public override void Play()
         {
-            StartCoroutine(MoveCoroutine());
-        }
-
-        private IEnumerator MoveCoroutine()
-        {
-            int currentLoop = 0;
-            while (currentLoop < LoopCount || LoopCount == -1)
+            if (moveTween == null)
             {
-                Vector3 initalPosition = TransformToMove.position;
-                Vector3 targetPosition = MovePositions + initalPosition;
-                float elapsed = 0f;
+                Vector3 targetPosition = MovePositions;
+                if (!IsLocal)
+                    targetPosition += TransformToMove.position;
 
-                while (elapsed < MoveDuration)
-                {
-                    float t = elapsed / MoveDuration;
-                    t = RotationCurve.Evaluate(t);
-                    TransformToMove.position = Vector3.Lerp(initalPosition, targetPosition, t);
+                moveTween = (IsLocal ? TransformToMove.DOLocalMove(targetPosition, MoveDuration)
+                                           : TransformToMove.DOMove(targetPosition, MoveDuration))
+                                            .SetEase(MoveEase)
+                                            .SetAutoKill(AutoKillOnComplete)
+                                            .OnComplete(() => OnComplete?.Invoke())
+                                            .Pause();
 
-                    elapsed += Time.deltaTime;
-                    yield return null;
-                }
-
-                currentLoop++;
+                if (Loop) moveTween.SetLoops(LoopCount, LoopType);
             }
+
+
+            moveTween.Restart();
         }
     }
 }

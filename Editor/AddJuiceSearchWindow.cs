@@ -9,7 +9,29 @@ namespace TGSJuice
 {
     public class AddJuiceSearchWindow : ScriptableObject, ISearchWindowProvider
     {
+        private List<Type> _juiceTypes;
         private Dictionary<Type, string> juices = new Dictionary<Type, string>();
+
+        private void OnEnable()
+        {
+            GetJuiceTypes();
+        }
+
+        private void GetJuiceTypes()
+        {
+
+            _juiceTypes = (from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                           from assemblyType in domainAssembly.GetTypes()
+                           where assemblyType.IsSubclassOf(typeof(TGSJuiceBase))
+                           select assemblyType).ToList();
+
+            foreach (var juiceType in _juiceTypes)
+            {
+                var juiceLabel = Attribute.GetCustomAttribute(juiceType, typeof(JuiceLabelAttribute)) as JuiceLabelAttribute;
+                var label = juiceLabel != null ? juiceLabel.Label : juiceType.Name;
+                juices.Add(juiceType, label);
+            }
+        }
 
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context)
         {
