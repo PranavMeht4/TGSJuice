@@ -7,3 +7,7 @@ The plugin is still under development.
 
 ## ToDo:
 
+Add more Juices
+Refactor script
+Improve editor
+Test on multiple unity versions
