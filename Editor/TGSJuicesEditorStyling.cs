@@ -44,6 +44,8 @@ namespace TGSJuice
                 style.alignment = TextAnchor.MiddleLeft;
                 style.fontSize = 13;
                 style.fontStyle = FontStyle.Bold;
+                style.normal.textColor = Color.white;
+                style.onNormal.textColor = Color.white;
                 return style;
             }
         }
@@ -93,24 +95,33 @@ namespace TGSJuice
 
         public static bool DrawStyledFoldout(bool foldout, string label, string icon, Action onClick)
         {
-            GUIStyle backgroundStyle = new GUIStyle(GUI.skin.box);
-            backgroundStyle.normal.background = MakeTex(1, 1, new Color(0.1f, 0.1f, 0.1f, .4f));
-
             EditorGUI.indentLevel++;
-            GUILayout.BeginVertical(backgroundStyle);
+
+            GUIStyle backgroundStyle = new GUIStyle();
+            backgroundStyle.normal.background = MakeTex(1, 1, new Color(0.5f, 0.5f, 0.5f, 0.3f));
+
+            EditorGUILayout.BeginVertical(backgroundStyle);
             {
-                GUILayout.BeginHorizontal();
+                Rect rect = EditorGUILayout.BeginHorizontal();
                 {
+                    GUIStyle lineStyle = new GUIStyle();
+                    lineStyle.normal.background = MakeTex(1, 1, new Color(1f, 1f, 1f, 1f));
+                    GUILayout.Box("", lineStyle, GUILayout.Width(5), GUILayout.Height(EditorGUIUtility.singleLineHeight));
+
                     GUIContent content = new GUIContent($"   {label}", EditorGUIUtility.IconContent(icon).image);
-                    foldout = EditorGUILayout.Foldout(foldout, content, true, FoldoutStyle);
-                    if (GUILayout.RepeatButton("X", GUILayout.MaxWidth(20)))
+
+                    rect.x += 10;
+                    foldout = EditorGUI.Foldout(rect, foldout, content, true, FoldoutStyle);
+
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("X", GUILayout.MaxWidth(20)))
                     {
                         onClick?.Invoke();
                     }
                 }
-                GUILayout.EndHorizontal();
+                EditorGUILayout.EndHorizontal();
             }
-            GUILayout.EndVertical();
+            EditorGUILayout.EndVertical();
             EditorGUI.indentLevel--;
 
             return foldout;
@@ -118,7 +129,7 @@ namespace TGSJuice
 
         public static void DrawStyledSearchWindow(Action<Type> onClick)
         {
-            if (GUILayout.Button("Add new juice...", EditorStyles.popup))
+            if (GUILayout.Button("Add new juice...", EditorStyles.popup, GUILayout.Width(250)))
             {
                 SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), ScriptableObject.CreateInstance<AddJuiceSearchWindow>());
                 AddJuiceSearchWindow.OnClickJuiceType(onClick);

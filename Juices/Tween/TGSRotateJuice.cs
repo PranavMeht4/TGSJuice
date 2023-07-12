@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Events;
 
 namespace TGSJuice
 {
@@ -19,8 +20,8 @@ namespace TGSJuice
         public int LoopCount = 0;
         [HideIfFalse("Loop")]
         public LoopType LoopType = LoopType.Restart;
-        public bool AutoKillOnComplete = true;
-        public System.Action OnComplete;
+        public bool AutoKillOnComplete = false;
+        public UnityEvent OnComplete;
 
         private Tween rotateTween;
 

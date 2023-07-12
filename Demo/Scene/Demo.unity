@@ -1881,6 +1881,62 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 3148098672101138336, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: IsLocal
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3148098672101138336, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateEase
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 3148098672101138336, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3148098672101138336, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateAngles.y
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3148098672101138336, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateDuration
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 3148098672101138336, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: TransformToRotate
+      value: 
+      objectReference: {fileID: 112469219}
+    - target: {fileID: 3148098672101138336, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: AutoKillOnComplete
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: IsLocal
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateEase
+      value: 27
+      objectReference: {fileID: 0}
+    - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateAngles.y
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: RotateDuration
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: TransformToRotate
+      value: 
+      objectReference: {fileID: 993172369}
+    - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: AutoKillOnComplete
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5034170816350849399, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
       propertyPath: TransformsToRotate.Array.data[0]
       value: 
@@ -1893,6 +1949,18 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 734360851}
+    - target: {fileID: 6294993634082264490, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: Delay
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6294993634082264490, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: delay
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6294993634082264490, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
+      propertyPath: areEventsEnabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6294993634082264490, guid: eceead30ceacfc24d85c5b28eb426086, type: 3}
       propertyPath: juices.Array.size
       value: 8

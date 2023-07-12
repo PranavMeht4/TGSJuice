@@ -12,9 +12,19 @@ namespace TGSJuice
         private Dictionary<int, Editor> _juiceEditors = new Dictionary<int, Editor>();
         private const string FoldOutStateKeyPrefix = "TGSJuice_FoldOut_";
         private TGSJuices targetTGSJuices;
+        SerializedProperty delayProp;
+
+        private void OnEnable()
+        {
+            delayProp = serializedObject.FindProperty("Delay");
+        }
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
+            EditorGUILayout.PropertyField(delayProp);
+
             targetTGSJuices = (TGSJuices)base.target;
 
             foreach (var juice in targetTGSJuices.GetComponents<TGSJuiceBase>())
@@ -90,7 +100,6 @@ namespace TGSJuice
 
         private void RemoveAction(TGSJuices target, TGSJuiceBase juice)
         {
-            GUIUtility.hotControl = 0;
             Undo.RecordObject(target, "Remove Juice");
             _juiceEditors.Remove(juice.GetInstanceID());
             target.juices.Remove(juice);
